@@ -31,7 +31,7 @@ def get_distance(coffee):
 
 def detect_file_encoding(path):
     result = from_path(path).best()
-    if result is not None:
+    if result:
         return result.encoding
     return None
 
