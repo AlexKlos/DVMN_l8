@@ -2,3 +2,4 @@ requests==2.*
 python-dotenv
 geopy
 folium
+charset-normalizer

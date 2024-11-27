@@ -1,10 +1,10 @@
 import json
 import os
-from pprint import pprint
 import requests
 
-import folium
+from charset_normalizer import from_path
 from dotenv import load_dotenv
+import folium
 from geopy import distance
 
 
@@ -29,6 +29,12 @@ def fetch_coordinates(apikey, address):
 def get_distance(coffee):
     return coffee['distance']
 
+def detect_file_encoding(path):
+    result = from_path(path).best()
+    if result is not None:
+        return result.encoding
+    return None
+
 
 def main():
     load_dotenv()
@@ -40,10 +46,12 @@ def main():
         float(user_coordinates[1]), 
         float(user_coordinates[0])
         )
-    print('Ваши координаты:', user_coordinates)
-
-    with open('coffee.json', 'r') as coffee_file:
-        coffee_file_contents = json.loads(coffee_file.read())
+    
+    path = 'coffee.json'
+    encoding = detect_file_encoding(path)
+    if encoding:
+        with open(path, 'r', encoding=encoding) as coffee_file:
+            coffee_file_contents = json.loads(coffee_file.read())
 
     coffees = []
 
@@ -63,7 +71,6 @@ def main():
         coffees.append(normalized_coffee)
 
     sorted_coffees = sorted(coffees, key=get_distance)
-    pprint(sorted_coffees[:5])
 
     user_map = folium.Map(reversed_user_coordinates)
 
